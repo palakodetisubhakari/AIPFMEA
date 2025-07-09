@@ -9,7 +9,7 @@ from azure.ai.inference.models import SystemMessage, UserMessage
 
 # --- Azure Inference Config ---
 endpoint = "https://models.github.ai/inference"
-model = "openai/gpt-3.5-turbo"  # Try this identifier!
+model = "gpt-35-turbo" # Try this identifier!
 
 # Load token securely from Streamlit secrets
 token = st.secrets.get("GITHUB_TOKEN", None)
