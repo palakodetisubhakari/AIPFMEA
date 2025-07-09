@@ -1,28 +1,16 @@
-# -*- coding: utf-8 -*-
 import os
 import io
 import pandas as pd
 import streamlit as st
-from azure.core.credentials import AzureKeyCredential
-from azure.ai.inference import ChatCompletionsClient
-from azure.ai.inference.models import SystemMessage, UserMessage
+import openai
 
-# --- Azure Inference Config ---
-endpoint = "https://models.github.ai/inference"
-model = "gpt-35-turbo" # Try this identifier!
-
-# Load token securely from Streamlit secrets
-token = st.secrets.get("GITHUB_TOKEN", None)
-
-if not token:
-    st.error("❌ GITHUB_TOKEN not found. Please add it to your Streamlit secrets.")
+# --- OpenAI Config ---
+openai_api_key = st.secrets.get("OPENAI_API_KEY", None)
+if not openai_api_key:
+    st.error("❌ OPENAI_API_KEY not found. Please add it to your Streamlit secrets.")
     st.stop()
 
-# --- GPT Client ---
-client = ChatCompletionsClient(
-    endpoint=endpoint,
-    credential=AzureKeyCredential(token),
-)
+openai.api_key = openai_api_key
 
 # --- Streamlit UI ---
 st.title("🛠️ AI-Powered PFMEA Generator")
@@ -63,14 +51,14 @@ Output as a markdown table with the following columns:
 
         with st.spinner("🧠 Generating PFMEA..."):
             try:
-                response = client.complete(
+                response = openai.ChatCompletion.create(
+                    model="gpt-3.5-turbo",  # Or "gpt-4" if you have access
                     messages=[
-                        SystemMessage("You are an expert PFMEA assistant."),
-                        UserMessage(base_prompt)
+                        {"role": "system", "content": "You are an expert PFMEA assistant."},
+                        {"role": "user", "content": base_prompt}
                     ],
                     temperature=0.5,
-                    top_p=1,
-                    model=model
+                    top_p=1
                 )
 
                 content = response.choices[0].message.content
